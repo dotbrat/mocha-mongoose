@@ -18,6 +18,7 @@ module.exports = function(uriString, options) {
   }
 
   var db = null;
+  var myClient = null;
 
   if (!options.noClear && !beforeEachRegistered) {
     if ('function' == typeof beforeEach && beforeEach.length > 0) {
@@ -42,10 +43,11 @@ module.exports = function(uriString, options) {
   function clearDB(done) {
     if (db) return clearCollections(done);
 
-    client.connect(uriString, function(err, newDb){
+    client.connect(uriString, function(err, newClient){
       if (err) return done(err);
 
-      db = newDb;
+      db = newClient.db();
+      myClient = newClient;
 
       clearCollections(done);
     });
@@ -70,6 +72,6 @@ module.exports = function(uriString, options) {
   }
 
   function closeDB() {
-    db.close();
+    myClient.close();
   }
 };
